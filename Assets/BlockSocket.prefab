@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5812797495490259468}
   m_Layer: 0
   m_Name: Socket
-  m_TagString: Socket
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

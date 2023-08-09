@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Socket : MonoBehaviour
+public class Socket : Interactable
 {
-    public void Activate()
+    public override bool Interact()
     {
-        print("SOCKET!");
+        return false;
     }
 }

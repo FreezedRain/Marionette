@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-    private Socket hoverSocket;
+    private Interactable hoverInteractable;
     private Socket stuckSocket;
 
     [SerializeField]
@@ -17,24 +17,40 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Action"))
         {
-            print("Test");
-            print("hoverSocket: " + hoverSocket);
-            print("stuckSocket: " + stuckSocket);
-            if (hoverSocket != null && stuckSocket == null)
-            {
-                stuckSocket = hoverSocket;
-                movement.SetSocket(stuckSocket.transform);
-                movement.SetActive(false);
+            if (hoverInteractable != null)
+            {              
+                if (stuckSocket != null)
+                {
+                    hoverInteractable = stuckSocket;
+                    stuckSocket = null;
 
-                animations.Socket();
+                    animations.Unsocket();
 
-            } else if (stuckSocket != null)
-            {
-                hoverSocket = stuckSocket;
-                stuckSocket = null;
-                movement.SetActive(true);
+                    movement.SetFree();
+                }
+                else
+                {
+                    if (hoverInteractable is Socket)
+                    {
 
-                animations.Unsocket();
+                        stuckSocket = (Socket)hoverInteractable;
+                        movement.SetSocket(stuckSocket.transform);
+
+                        animations.Socket();
+                    }
+                    if (hoverInteractable is DialogTrigger)
+                    {
+
+                        if (hoverInteractable.Interact())
+                        {
+                            movement.SetInteracting();
+                        } else
+                        {
+                            movement.SetFree();
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -42,15 +58,15 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        hoverSocket = other.gameObject.GetComponent<Socket>();
+        hoverInteractable = other.gameObject.GetComponent<Interactable>();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Socket s = other.gameObject.GetComponent<Socket>();
-        if (s != null && s == hoverSocket)
+        Interactable i = other.gameObject.GetComponent<Interactable>();
+        if (i != null && i == hoverInteractable)
         {
-            hoverSocket = null;
+            hoverInteractable = null;
         }
     }
 

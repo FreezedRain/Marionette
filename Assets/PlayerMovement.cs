@@ -66,6 +66,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private Transform neck;
 
+    public enum MOVEMENT_STATE
+    {
+        FREE,
+        SOCKETED,
+        INTERACTING
+    }
+
+    private MOVEMENT_STATE movementState = MOVEMENT_STATE.FREE;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -87,22 +96,37 @@ public class PlayerMovement : MonoBehaviour
         cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
         Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
 
-        cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
-
         groundPointChar.rotation = Quaternion.Lerp(groundPointChar.rotation, trot, 10 * Time.deltaTime);
 
-        if (!active)
+        switch (movementState)
         {
-            transform.position = Vector3.Lerp(transform.position, tpos, 10 * Time.deltaTime);
+            case MOVEMENT_STATE.INTERACTING:
+                break;
+            case MOVEMENT_STATE.SOCKETED:
+                cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
 
+                transform.position = Vector3.Lerp(transform.position, tpos, 10 * Time.deltaTime);
 
-            neck.transform.localEulerAngles = new Vector3(move.y * 30, 0, -move.x*30);
-        } else
-        {
-            neck.transform.localEulerAngles = new Vector3(0, 0, 0);
+                neck.transform.localEulerAngles = new Vector3(move.y * 30, 0, -move.x * 30);
+                break;
+            case MOVEMENT_STATE.FREE:
+                cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
+
+                neck.transform.localEulerAngles = new Vector3(0, 0, 0);
+
+                StateFree();
+                break;
         }
+        
+    }
 
-        if (!active) return;
+    private void StateFree()
+    {
+        Vector2 move = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        Vector2 move2 = new Vector3(Input.GetAxis("Horizontal2"), Input.GetAxis("Vertical2"));
+
+        cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
+        Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
 
         if (Physics.Raycast(new Ray(groundPoint.position + up * 0.2f, -up), out var hit, 0.3f, groundMask))
         {
@@ -119,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             isGrounded = false;
-        }        
+        }
 
         //forward = cameraForward;
         //side = cameraRight;
@@ -157,7 +181,7 @@ public class PlayerMovement : MonoBehaviour
 
         GravitySwap();
 
-        
+
 
         DrawDebug();
     }
@@ -201,14 +225,6 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawSphere(groundPoint.position, 0.05f);
     }
 
-    public void SetActive(bool active)
-    {
-        this.active = active;
-        colliderTransform.GetComponent<Collider>().enabled = active;
-        hsp = Vector2.zero;
-        rb.velocity = Vector3.zero;
-    }
-
     public void SetSocket(Transform socketTransform)
     {
         tup = socketTransform.up;
@@ -217,6 +233,24 @@ public class PlayerMovement : MonoBehaviour
 
         trot = Quaternion.LookRotation(characterForward, up);
         tpos = socketTransform.position;
+
+        hsp = Vector2.zero;
+        rb.velocity = Vector3.zero;
+
+        movementState = MOVEMENT_STATE.SOCKETED;
+    }
+
+    public void SetInteracting()
+    {
+        hsp = Vector2.zero;
+        rb.velocity = Vector3.zero;
+
+        movementState = MOVEMENT_STATE.INTERACTING;
+    }
+
+    public void SetFree()
+    {
+        movementState = MOVEMENT_STATE.FREE;
     }
 
     public float GetSpeed()
