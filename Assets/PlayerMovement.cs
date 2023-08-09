@@ -60,6 +60,9 @@ public class PlayerMovement : MonoBehaviour
     private Quaternion trot;
     private Vector3 tpos;
 
+    [SerializeField]
+    private Transform neck;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -75,7 +78,12 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
 
+        Vector2 move = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         Vector2 move2 = new Vector3(Input.GetAxis("Horizontal2"), Input.GetAxis("Vertical2"));
+
+        cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
+        Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
+
         cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
 
         groundPointChar.rotation = Quaternion.Lerp(groundPointChar.rotation, trot, 10 * Time.deltaTime);
@@ -83,6 +91,9 @@ public class PlayerMovement : MonoBehaviour
         if (!active)
         {
             transform.position = Vector3.Lerp(transform.position, tpos, 10 * Time.deltaTime);
+
+
+            neck.transform.localEulerAngles = -cameraForward * move.x * 30 + cameraRight * move.y*30;
         }
 
         if (!active) return;
@@ -102,14 +113,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             isGrounded = false;
-        }
-
-        Vector2 move = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-        
-
-        cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
-        Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
+        }        
 
         //forward = cameraForward;
         //side = cameraRight;
