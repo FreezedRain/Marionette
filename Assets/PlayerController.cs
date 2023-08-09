@@ -43,7 +43,6 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         hoverSocket = other.gameObject.GetComponent<Socket>();
-        print("Enter");
     }
 
     private void OnTriggerExit(Collider other)
@@ -53,7 +52,6 @@ public class PlayerController : MonoBehaviour
         {
             hoverSocket = null;
         }
-        print("Leave");
     }
 
 }

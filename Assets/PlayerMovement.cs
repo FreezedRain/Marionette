@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
+    [SerializeField]
+    public float speed = 1;
+
     private float _gravity = -9.8f;
 
     private float vsp = 0;
@@ -93,7 +96,10 @@ public class PlayerMovement : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, tpos, 10 * Time.deltaTime);
 
 
-            neck.transform.localEulerAngles = -cameraForward * move.x * 30 + cameraRight * move.y*30;
+            neck.transform.localEulerAngles = new Vector3(move.y * 30, 0, -move.x*30);
+        } else
+        {
+            neck.transform.localEulerAngles = new Vector3(0, 0, 0);
         }
 
         if (!active) return;
@@ -118,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         //forward = cameraForward;
         //side = cameraRight;
 
-        hsp = move;
+        hsp = move * speed;
 
         if (isGrounded)
         {
@@ -199,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
     {
         this.active = active;
         colliderTransform.GetComponent<Collider>().enabled = active;
+        hsp = Vector2.zero;
         rb.velocity = Vector3.zero;
     }
 
@@ -210,5 +217,15 @@ public class PlayerMovement : MonoBehaviour
 
         trot = Quaternion.LookRotation(characterForward, up);
         tpos = socketTransform.position;
+    }
+
+    public float GetSpeed()
+    {
+        return hsp.magnitude;
+    }
+
+    public bool IsActive()
+    {
+        return active;
     }
 }
