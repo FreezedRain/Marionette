@@ -8,4 +8,19 @@ public class Interactable : MonoBehaviour
     {
         return false;
     }
+
+    public virtual Vector3 GetInterestPosition()
+    {
+        return transform.position;
+    }
+
+    public virtual void OnHover()
+    {
+        return;
+    }
+
+    public virtual void OnUnhover()
+    {
+        return;
+    }
 }

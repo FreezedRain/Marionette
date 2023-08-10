@@ -240,10 +240,12 @@ public class PlayerMovement : MonoBehaviour
         movementState = MOVEMENT_STATE.SOCKETED;
     }
 
-    public void SetInteracting()
+    public void SetInteracting(Interactable interactable)
     {
         hsp = Vector2.zero;
         rb.velocity = Vector3.zero;
+
+        trot = Quaternion.LookRotation(interactable.GetInterestPosition() - transform.position, up);
 
         movementState = MOVEMENT_STATE.INTERACTING;
     }

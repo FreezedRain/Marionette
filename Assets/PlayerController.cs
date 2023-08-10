@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
 
                         if (hoverInteractable.Interact())
                         {
-                            movement.SetInteracting();
+                            movement.SetInteracting(hoverInteractable);
                         } else
                         {
                             movement.SetFree();
@@ -59,6 +59,9 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         hoverInteractable = other.gameObject.GetComponent<Interactable>();
+        if (hoverInteractable != null) hoverInteractable.OnHover();
+
+        print("Enter " + other.gameObject.name);
     }
 
     private void OnTriggerExit(Collider other)
@@ -66,8 +69,11 @@ public class PlayerController : MonoBehaviour
         Interactable i = other.gameObject.GetComponent<Interactable>();
         if (i != null && i == hoverInteractable)
         {
+            hoverInteractable.OnUnhover();
             hoverInteractable = null;
         }
+
+        print("Exit " + other.gameObject.name);
     }
 
 }
