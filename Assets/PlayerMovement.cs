@@ -148,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
         //forward = cameraForward;
         //side = cameraRight;
 
-        hsp = move * speed;
+        hsp = move.normalized * speed;
 
         if (isGrounded)
         {
