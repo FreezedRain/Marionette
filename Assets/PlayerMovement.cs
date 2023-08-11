@@ -66,6 +66,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private Transform neck;
 
+    private Socket socket;
+    private Quaternion rotationRelativeToSocket;
+
     public enum MOVEMENT_STATE
     {
         FREE,
@@ -96,20 +99,36 @@ public class PlayerMovement : MonoBehaviour
         cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
         Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
 
-        groundPointChar.rotation = Quaternion.Lerp(groundPointChar.rotation, trot, 10 * Time.deltaTime);
-
         switch (movementState)
         {
             case MOVEMENT_STATE.INTERACTING:
+
+                groundPointChar.rotation = Quaternion.Lerp(groundPointChar.rotation, trot, 10 * Time.deltaTime);
                 break;
             case MOVEMENT_STATE.SOCKETED:
                 cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
 
-                transform.position = Vector3.Lerp(transform.position, tpos, 10 * Time.deltaTime);
+                transform.position = Vector3.Lerp(transform.position, socket.transform.position, 10 * Time.deltaTime);
 
-                neck.transform.localEulerAngles = new Vector3(move.y * 30, 0, -move.x * 30);
+                Vector3 cameraMove = cameraForward * move.y + cameraRight * move.x;
+
+                Vector3 joystickVector = Vector3.LerpUnclamped(up.normalized, cameraMove.normalized, 0.5f * move.magnitude).normalized;
+                Debug.DrawLine(transform.position, transform.position + joystickVector * 10, Color.red);
+
+                Vector3 cameraMoveRotated = Quaternion.AngleAxis(-groundPointChar.localEulerAngles.y, up) * cameraMove;
+
+                neck.transform.rotation = Quaternion.LookRotation(Vector3.Cross(joystickVector, side), joystickVector);
+
+                socket.SetInput(cameraMove);
+
+                Debug.DrawLine(transform.position, transform.position + cameraMove * 10, Color.green);
+
+                groundPointChar.rotation = socket.transform.rotation * Quaternion.LookRotation(socket.GetSittingDir(), transform.up);
+
                 break;
             case MOVEMENT_STATE.FREE:
+
+                groundPointChar.rotation = Quaternion.Lerp(groundPointChar.rotation, trot, 10 * Time.deltaTime);
                 cameraPivotPlayerControl.localEulerAngles += new Vector3(0, move2.x, 0) * Time.deltaTime * 60f;
 
                 neck.transform.localEulerAngles = new Vector3(0, 0, 0);
@@ -123,7 +142,6 @@ public class PlayerMovement : MonoBehaviour
     private void StateFree()
     {
         Vector2 move = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        Vector2 move2 = new Vector3(Input.GetAxis("Horizontal2"), Input.GetAxis("Vertical2"));
 
         cameraForward = Vector3.ProjectOnPlane(cameraPivotPlayerControl.forward, up).normalized;
         Vector3 cameraRight = (Quaternion.AngleAxis(90, up) * cameraForward).normalized;
@@ -179,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
         trot = Quaternion.LookRotation(characterForward, up);
 
 
-        GravitySwap();
+        //GravitySwap();
 
 
 
@@ -225,14 +243,18 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawSphere(groundPoint.position, 0.05f);
     }
 
-    public void SetSocket(Transform socketTransform)
+    public void SetSocket(Socket socket)
     {
-        tup = socketTransform.up;
+        this.socket = socket;
+        
+        tup = socket.transform.up;
 
-        characterForward = socketTransform.forward;
+        Vector3 sitForward = socket.GetClosestDirection(characterForward);
+
+        characterForward = sitForward;
 
         trot = Quaternion.LookRotation(characterForward, up);
-        tpos = socketTransform.position;
+        tpos = socket.transform.position;
 
         hsp = Vector2.zero;
         rb.velocity = Vector3.zero;

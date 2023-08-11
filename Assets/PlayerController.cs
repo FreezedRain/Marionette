@@ -13,6 +13,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private PlayerAnimations animations;
 
+    private Transform ogPartner;
+
+    private void Start()
+    {
+        ogPartner = transform.parent;
+    }
+
     public void Update()
     {
         if (Input.GetButtonDown("Action"))
@@ -22,9 +29,12 @@ public class PlayerController : MonoBehaviour
                 if (stuckSocket != null)
                 {
                     hoverInteractable = stuckSocket;
+                    stuckSocket.DeactivateSocket();
                     stuckSocket = null;
 
-                    animations.Unsocket();
+                    transform.SetParent(ogPartner);
+
+                    animations.Unsocket();                    
 
                     movement.SetFree();
                 }
@@ -34,7 +44,11 @@ public class PlayerController : MonoBehaviour
                     {
 
                         stuckSocket = (Socket)hoverInteractable;
-                        movement.SetSocket(stuckSocket.transform);
+                        movement.SetSocket(stuckSocket);
+
+                        stuckSocket.ActivateSocket();
+
+                        transform.SetParent(stuckSocket.transform);
 
                         animations.Socket();
                     }
