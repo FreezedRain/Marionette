@@ -706,7 +706,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Vector, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"vector":{"x":0.20000000298023225,"y":0.3499999940395355,"z":0.20000000298023225}}'
+      m_SerializableObject: '{"vector":{"x":0.20000000298023225,"y":0.25,"z":0.20000000298023225}}'
     m_Space: 0
   m_Property:
     name: B
