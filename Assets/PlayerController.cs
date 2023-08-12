@@ -28,15 +28,7 @@ public class PlayerController : MonoBehaviour
             {              
                 if (stuckSocket != null)
                 {
-                    hoverInteractable = stuckSocket;
-                    stuckSocket.DeactivateSocket();
-                    stuckSocket = null;
-
-                    transform.SetParent(ogPartner);
-
-                    animations.Unsocket();                    
-
-                    movement.SetFree();
+                    stuckSocket.Eject();
                 }
                 else
                 {
@@ -46,7 +38,7 @@ public class PlayerController : MonoBehaviour
                         stuckSocket = (Socket)hoverInteractable;
                         movement.SetSocket(stuckSocket);
 
-                        stuckSocket.ActivateSocket();
+                        stuckSocket.ActivateSocket(this);
 
                         transform.SetParent(stuckSocket.transform);
 
@@ -88,6 +80,19 @@ public class PlayerController : MonoBehaviour
         }
 
         print("Exit " + other.gameObject.name);
+    }
+
+    public void Unsocket()
+    {
+        hoverInteractable = stuckSocket;
+        stuckSocket.DeactivateSocket();
+        stuckSocket = null;
+
+        transform.SetParent(ogPartner);
+
+        animations.Unsocket();
+
+        movement.SetFree();
     }
 
 }

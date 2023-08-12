@@ -117,13 +117,16 @@ public class PlayerMovement : MonoBehaviour
 
                 Vector3 cameraMoveRotated = Quaternion.AngleAxis(-groundPointChar.localEulerAngles.y, up) * cameraMove;
 
-                neck.transform.rotation = Quaternion.LookRotation(Vector3.Cross(joystickVector, side), joystickVector);
+
+                Vector3 characterSide = -Vector3.Cross(up, characterForward);
+
+                //neck.transform.rotation = Quaternion.LookRotation(Vector3.Cross(joystickVector, characterSide), joystickVector);
 
                 socket.SetInput(cameraMove);
 
                 Debug.DrawLine(transform.position, transform.position + cameraMove * 10, Color.green);
 
-                groundPointChar.rotation = socket.transform.rotation * Quaternion.LookRotation(socket.GetSittingDir(), transform.up);
+                //groundPointChar.rotation = Quaternion.LookRotation(socket.GetSittingDir(), socket.GetUpDir());*/
 
                 break;
             case MOVEMENT_STATE.FREE:
@@ -137,6 +140,12 @@ public class PlayerMovement : MonoBehaviour
                 break;
         }
         
+    }
+
+    private void Sit()
+    {
+        LeanTween.moveLocal(gameObject, Vector3.zero, 0.25f);
+        LeanTween.rotateLocal(groundPointChar.gameObject, socket.GetRotationRelativeToSocket().eulerAngles, 0.25f);
     }
 
     private void StateFree()
@@ -260,6 +269,8 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = Vector3.zero;
 
         movementState = MOVEMENT_STATE.SOCKETED;
+
+        Sit();
     }
 
     public void SetInteracting(Interactable interactable)
@@ -285,5 +296,10 @@ public class PlayerMovement : MonoBehaviour
     public bool IsActive()
     {
         return active;
+    }
+
+    public MOVEMENT_STATE GetMovementState()
+    {
+        return movementState;
     }
 }

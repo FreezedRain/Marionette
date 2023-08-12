@@ -100,12 +100,18 @@ public class PlayerAnimations : MonoBehaviour
         head.localEulerAngles -= new Vector3(0, reference.localEulerAngles.y - pf_reference_rotation.y, 0);
         head.localRotation = Quaternion.Slerp(head.localRotation, Quaternion.identity, Time.deltaTime*10);
 
-        //HAND 1
-        hand1.position -= (hand1.transform.position - pf_hand1_pos);
-        hand1.position = Vector3.Slerp(hand1.position, hand1pos.transform.position, Time.deltaTime * 20);
+        if (movement.GetMovementState() != PlayerMovement.MOVEMENT_STATE.SOCKETED)
+        {
+            //HAND 1
+            hand1.position -= (hand1.transform.position - pf_hand1_pos);
+            
 
-        //HAND 2
-        hand2.position -= (hand2.transform.position - pf_hand2_pos);
+            //HAND 2
+            hand2.position -= (hand2.transform.position - pf_hand2_pos);
+            
+        }
+
+        hand1.position = Vector3.Slerp(hand1.position, hand1pos.transform.position, Time.deltaTime * 20);
         hand2.position = Vector3.Slerp(hand2.position, hand2pos.transform.position, Time.deltaTime * 20);
 
         pf_reference_rotation = reference.localEulerAngles;

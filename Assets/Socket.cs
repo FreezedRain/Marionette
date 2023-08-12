@@ -15,7 +15,9 @@ public class Socket : Interactable
 
     private bool active = false;
 
-    private Vector3 sittingDir = Vector3.zero;
+    private PlayerController pc;
+
+    private Quaternion relativeSittingDir = Quaternion.identity;
 
     [SerializeField]
     private bool discrete = true;
@@ -60,15 +62,20 @@ public class Socket : Interactable
             puzzleElement?.Input(input, dir);
         }
 
-        Debug.DrawLine(transform.position, transform.position + sittingDir * 10, Color.red);
+        print(relativeSittingDir);
+        Debug.DrawLine(transform.position, transform.position + transform.forward * 20, Color.magenta);
+        Debug.DrawLine(transform.position, transform.position + relativeSittingDir * transform.forward * 30, Color.yellow);
 
     }
 
-    public void ActivateSocket()
+    public void ActivateSocket(PlayerController pc)
     {
         t = 0.5f;
         dir = Vector3.zero;
         active = true;
+        this.pc = pc;
+
+        puzzleElement.Engage();
     }
 
     public void DeactivateSocket()
@@ -107,7 +114,7 @@ public class Socket : Interactable
         }
 
         print(dir);
-        Vector3 trueDir = sittingDir * dir.z + Vector3.Cross(transform.up, sittingDir) * dir.x;
+        Vector3 trueDir = GetSittingDir() * dir.z + Vector3.Cross(transform.up, GetSittingDir()) * dir.x;
         print(trueDir);
 
         return dir;
@@ -115,11 +122,11 @@ public class Socket : Interactable
 
     public Vector3 GetClosestDirection(Vector3 inputDirection)
     {
-        Vector3 forward = transform.parent.forward;
+        Vector3 forward = transform.forward;
         Vector3 back = -forward;
-        Vector3 right = transform.parent.right;
+        Vector3 right = transform.right;
         Vector3 left = -right;
-            
+
         // Normalize the input and reference directions
         inputDirection.Normalize();
         forward.Normalize();
@@ -134,24 +141,51 @@ public class Socket : Interactable
         // Find the minimum angle
         float minAngle = Mathf.Min(angleForward, angleBack, angleRight, angleLeft);
 
-        sittingDir = forward.normalized;
+        Vector3 sittingDir = forward.normalized;
 
         // Return the direction corresponding to the minimum angle
-        if (minAngle == angleForward)
+        if (minAngle == angleForward) {
             sittingDir = forward.normalized;
-        else if (minAngle == angleBack)
+            relativeSittingDir = Quaternion.Euler(0, 0, 0);
+        } else if (minAngle == angleBack) {
             sittingDir = back.normalized;
-        else if (minAngle == angleRight)
+            relativeSittingDir = Quaternion.Euler(0, 180, 0);
+        } else if (minAngle == angleRight) {
             sittingDir = right.normalized;
-        else
+            relativeSittingDir = Quaternion.Euler(0, 90, 0);
+        } else {
             sittingDir = left.normalized;
+            relativeSittingDir = Quaternion.Euler(0, -90, 0);
+        }
+
 
         return sittingDir;
     }
 
+    public Vector3 GetRelativeSittingDir()
+    {
+        return GetSittingDir();
+    }
+
     public Vector3 GetSittingDir()
     {
-        return sittingDir;
+        return relativeSittingDir * transform.forward;
+    }
+
+    public Quaternion GetRotationRelativeToSocket()
+    {
+        return relativeSittingDir;
+    }
+
+    public Vector3 GetUpDir()
+    {
+        return transform.up;
+    }
+
+    public void Eject()
+    {
+        pc?.Unsocket();
+        pc = null;
     }
 
 

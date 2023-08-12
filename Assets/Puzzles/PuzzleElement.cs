@@ -7,6 +7,11 @@ public class PuzzleElement : MonoBehaviour
 
     protected Puzzle puzzle;
 
+    public virtual void Engage()
+    {
+        print("MEC");
+    }
+
     public virtual void Input(Vector3 input, Vector3 dir)
     {
         print("MEC");
