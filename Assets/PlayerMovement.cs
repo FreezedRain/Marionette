@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -65,6 +66,9 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField]
     private Transform neck;
+
+    [SerializeField]
+    private VisualEffect moveParticles;
 
     private Socket socket;
     private Quaternion rotationRelativeToSocket;
@@ -269,6 +273,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = Vector3.zero;
 
         movementState = MOVEMENT_STATE.SOCKETED;
+        moveParticles.Stop();
 
         Sit();
     }
@@ -286,6 +291,7 @@ public class PlayerMovement : MonoBehaviour
     public void SetFree()
     {
         movementState = MOVEMENT_STATE.FREE;
+        moveParticles.Play();
     }
 
     public float GetSpeed()

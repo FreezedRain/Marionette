@@ -349,6 +349,7 @@ MonoBehaviour:
   groundPoint: {fileID: 672354835362051153}
   groundPointChar: {fileID: 2310325710645215297}
   neck: {fileID: 1518318376259878228}
+  moveParticles: {fileID: 5374695354820782292}
 --- !u!135 &2083108144345871163
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1278,7 +1279,7 @@ VisualEffect:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6633454934703953257}
   m_Enabled: 1
-  m_Asset: {fileID: 8926484042661614526, guid: fa5a75b096eae0c498a88f124c8ba3ec, type: 3}
+  m_Asset: {fileID: 8926484042661614526, guid: 443287bb9f6ca4346bdb3cff68fd0d97, type: 3}
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0
